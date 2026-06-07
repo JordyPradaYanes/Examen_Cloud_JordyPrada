@@ -3,6 +3,9 @@ on:
   push:
     branches: [master]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   Deploy:
     runs-on: ubuntu-latest
@@ -22,23 +25,27 @@ jobs:
           aws cloudformation deploy \
             --template-file cloudformation/security.yml \
             --stack-name SecurityGroups-JordyPrada \
-            --capabilities CAPABILITY_NAMED_IAM
+            --capabilities CAPABILITY_NAMED_IAM \
+            --no-fail-on-empty-changeset
 
       - name: Deploy EC2 Stack
         run: |
           aws cloudformation deploy \
             --template-file cloudformation/ec2.yml \
-            --stack-name EC2-JordyPrada
+            --stack-name EC2-JordyPrada \
+            --no-fail-on-empty-changeset
 
       - name: Deploy ALB-ASG Stack
         run: |
           aws cloudformation deploy \
             --template-file cloudformation/alb-asg.yml \
             --stack-name ALB-ASG-JordyPrada \
-            --parameter-overrides VpcId=vpc-0551a786fff021d6f SubnetIds=subnet-014686d5696588e49
+            --parameter-overrides VpcId=vpc-0551a786fff021d6f SubnetIds=subnet-014686d5696588e49 \
+            --no-fail-on-empty-changeset
 
       - name: Deploy Automation Stack
         run: |
           aws cloudformation deploy \
             --template-file cloudformation/automation.yml \
-            --stack-name Automation-JordyPrada
+            --stack-name Automation-JordyPrada \
+            --no-fail-on-empty-changeset

@@ -34,8 +34,12 @@ Resources:
   LaunchTemplateV2-JordyPrada:
     Type: AWS::EC2::LaunchTemplate
     Properties:
-      LaunchTemplateId: !ImportValue LaunchTemplateId
+      LaunchTemplateName: LT-V2-JordyPrada
       LaunchTemplateData:
+        ImageId: ami-00e801948462f718a
+        InstanceType: t3.micro
+        SecurityGroupIds:
+          - !ImportValue SGInstanciaId
         UserData:
           Fn::Base64: |
             #!/bin/bash
