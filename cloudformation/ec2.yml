@@ -7,7 +7,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: ami-00e801948462f718a
-      InstanceType: t2.micro
+      InstanceType: t3.micro
       SecurityGroupIds:
         - !ImportValue SGInstanciaId
       Tags:

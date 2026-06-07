@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ALB y ASG - JordyPrada
+
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+
+Resources:
+
+  TargetGroup-JordyPrada:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: TG-JordyPrada
+      Port: 80
+      Protocol: HTTP
+      VpcId: !Ref VpcId
+      HealthCheckPath: /
+      HealthCheckIntervalSeconds: 30
+
+  ALB-JordyPrada:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: ALB-JordyPrada
+      Scheme: internet-facing
+      SecurityGroups:
+        - !ImportValue SGAlbId
+      Subnets: !Ref SubnetIds
+
+  ListenerALB:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref ALB-JordyPrada
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup-JordyPrada
+
+  LaunchTemplate-JordyPrada:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: LT-JordyPrada
+      LaunchTemplateData:
+        ImageId: ami-00e801948462f718a
+        InstanceType: t3.micro
+        SecurityGroupIds:
+          - !ImportValue SGInstanciaId
+        UserData:
+          Fn::Base64: |
