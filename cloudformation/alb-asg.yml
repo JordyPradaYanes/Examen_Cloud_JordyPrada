@@ -49,3 +49,41 @@ Resources:
           - !ImportValue SGInstanciaId
         UserData:
           Fn::Base64: |
+            #!/bin/bash
+            yum install -y httpd
+            systemctl start httpd
+            echo '<h1>ASG - JordyPrada</h1>' > /var/www/html/index.html
+
+  ASG-JordyPrada:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: ASG-JordyPrada
+      MinSize: '1'
+      MaxSize: '3'
+      DesiredCapacity: '2'
+      VPCZoneIdentifier: !Ref SubnetIds
+      LaunchTemplate:
+        LaunchTemplateId: !Ref LaunchTemplate-JordyPrada
+        Version: !GetAtt LaunchTemplate-JordyPrada.LatestVersionNumber
+      TargetGroupARNs:
+        - !Ref TargetGroup-JordyPrada
+
+  WarmPool-JordyPrada:
+    Type: AWS::AutoScaling::WarmPool
+    Properties:
+      AutoScalingGroupName: !Ref ASG-JordyPrada
+      MinSize: 1
+
+Outputs:
+  ALBDns:
+    Value: !GetAtt ALB-JordyPrada.DNSName
+    Export:
+      Name: ALBDns
+  ASGName:
+    Value: !Ref ASG-JordyPrada
+    Export:
+      Name: ASGName
+  LaunchTemplateId:
+    Value: !Ref LaunchTemplate-JordyPrada
+    Export:
+      Name: LaunchTemplateId
