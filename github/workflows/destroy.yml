@@ -1,0 +1,38 @@
+name: Destroy Infrastructure
+on:
+  workflow_dispatch:   # Se activa manualmente
+
+jobs:
+  Destroy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Delete Automation Stack
+        run: aws cloudformation delete-stack --stack-name Automation-JordyPrada
+
+      - name: Wait Automation Stack
+        run: aws cloudformation wait stack-delete-complete --stack-name Automation-JordyPrada
+
+      - name: Delete ALB-ASG Stack
+        run: aws cloudformation delete-stack --stack-name ALB-ASG-JordyPrada
+
+      - name: Wait ALB-ASG Stack
+        run: aws cloudformation wait stack-delete-complete --stack-name ALB-ASG-JordyPrada
+
+      - name: Delete EC2 Stack
+        run: aws cloudformation delete-stack --stack-name EC2-JordyPrada
+
+      - name: Wait EC2 Stack
+        run: aws cloudformation wait stack-delete-complete --stack-name EC2-JordyPrada
+
+      - name: Delete Security Stack
+        run: aws cloudformation delete-stack --stack-name SecurityGroups-JordyPrada

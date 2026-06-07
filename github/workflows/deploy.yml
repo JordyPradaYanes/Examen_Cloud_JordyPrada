@@ -35,7 +35,7 @@ jobs:
           aws cloudformation deploy \
             --template-file cloudformation/alb-asg.yml \
             --stack-name ALB-ASG-JordyPrada \
-            --parameter-overrides VpcId=vpc-XXXXXXXX SubnetIds=subnet-AAAA,subnet-BBBB
+            --parameter-overrides VpcId=vpc-0551a786fff021d6f SubnetIds=subnet-014686d5696588e49
 
       - name: Deploy Automation Stack
         run: |
