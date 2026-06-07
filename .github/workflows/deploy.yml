@@ -1,7 +1,7 @@
 name: Deploy Infrastructure
 on:
   push:
-    branches: [main]
+    branches: [master]
 
 jobs:
   Deploy:
