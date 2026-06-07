@@ -20,6 +20,31 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      # -------------------------------------------------------
+      # Funcion reutilizable: elimina stacks en ROLLBACK_COMPLETE
+      # -------------------------------------------------------
+      - name: Cleanup stacks en ROLLBACK_COMPLETE
+        run: |
+          cleanup_stack() {
+            STACK_NAME=$1
+            STATUS=$(aws cloudformation describe-stacks \
+              --stack-name "$STACK_NAME" \
+              --query 'Stacks[0].StackStatus' \
+              --output text 2>/dev/null || echo "DOES_NOT_EXIST")
+            echo "Stack $STACK_NAME -> estado: $STATUS"
+            if [ "$STATUS" = "ROLLBACK_COMPLETE" ]; then
+              echo "Eliminando $STACK_NAME en ROLLBACK_COMPLETE..."
+              aws cloudformation delete-stack --stack-name "$STACK_NAME"
+              aws cloudformation wait stack-delete-complete --stack-name "$STACK_NAME"
+              echo "$STACK_NAME eliminado correctamente."
+            fi
+          }
+          cleanup_stack "SecurityGroups-JordyPrada"
+          cleanup_stack "EC2-JordyPrada"
+          cleanup_stack "ALB-ASG-JordyPrada"
+          cleanup_stack "Automation-JordyPrada"
+
+      # -------------------------------------------------------
       - name: Deploy Security Stack
         run: |
           aws cloudformation deploy \
@@ -40,7 +65,7 @@ jobs:
             aws cloudformation describe-stack-events \
               --stack-name EC2-JordyPrada \
               --query "StackEvents[?contains(['CREATE_FAILED','UPDATE_FAILED'], ResourceStatus)].[LogicalResourceId, ResourceStatus, ResourceStatusReason]" \
-              --output table 2>/dev/null || echo "Stack no existe (fue eliminado por rollback). Revisa el OUTPUT de arriba."
+              --output table 2>/dev/null || echo "Stack eliminado por rollback. Ver OUTPUT arriba."
             exit 1
           }
 
@@ -56,7 +81,7 @@ jobs:
             aws cloudformation describe-stack-events \
               --stack-name ALB-ASG-JordyPrada \
               --query "StackEvents[?contains(['CREATE_FAILED','UPDATE_FAILED'], ResourceStatus)].[LogicalResourceId, ResourceStatus, ResourceStatusReason]" \
-              --output table 2>/dev/null || echo "Stack no existe (fue eliminado por rollback). Revisa el OUTPUT de arriba."
+              --output table 2>/dev/null || echo "Stack eliminado por rollback. Ver OUTPUT arriba."
             exit 1
           }
 
@@ -71,6 +96,6 @@ jobs:
             aws cloudformation describe-stack-events \
               --stack-name Automation-JordyPrada \
               --query "StackEvents[?contains(['CREATE_FAILED','UPDATE_FAILED'], ResourceStatus)].[LogicalResourceId, ResourceStatus, ResourceStatusReason]" \
-              --output table 2>/dev/null || echo "Stack no existe (fue eliminado por rollback). Revisa el OUTPUT de arriba."
+              --output table 2>/dev/null || echo "Stack eliminado por rollback. Ver OUTPUT arriba."
             exit 1
           }
