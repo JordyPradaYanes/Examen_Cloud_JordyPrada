@@ -33,10 +33,10 @@ Resources:
 
 Outputs:
   SGInstanciaId:
-    Value: !Ref SGInstanciaJordyPrada
+    Value: !GetAtt SGInstanciaJordyPrada.GroupId
     Export:
       Name: SGInstanciaId
   SGAlbId:
-    Value: !Ref SGAlbJordyPrada
+    Value: !GetAtt SGAlbJordyPrada.GroupId
     Export:
       Name: SGAlbId
