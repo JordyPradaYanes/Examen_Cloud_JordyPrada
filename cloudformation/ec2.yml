@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: EC2 Estatica - JordyPrada
+
+Resources:
+
+  EC2-JordyPrada:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-00e801948462f718a
+      InstanceType: t2.micro
+      SecurityGroupIds:
+        - !ImportValue SGInstanciaId
+      Tags:
+        - Key: Name
+          Value: EC2-JordyPrada
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          yum update -y
+          yum install -y httpd
+          systemctl start httpd
+          systemctl enable httpd
+          echo '<h1>Hola desde Ocaña, Norte de Santander</h1>' > /var/www/html/index.html
+
+  ElasticIP-JordyPrada:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref EC2-JordyPrada
+
+Outputs:
+  PublicIP:
+    Value: !Ref ElasticIP-JordyPrada
+    Description: IP publica estatica de la instancia
+  InstanceId:
+    Value: !Ref EC2-JordyPrada
