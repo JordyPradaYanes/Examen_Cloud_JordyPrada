@@ -33,6 +33,7 @@ jobs:
           OUTPUT=$(aws cloudformation deploy \
             --template-file cloudformation/ec2.yml \
             --stack-name EC2-JordyPrada \
+            --parameter-overrides SubnetId=subnet-014686d5696588e49 \
             --no-fail-on-empty-changeset 2>&1) || {
             echo "$OUTPUT"
             echo "=== Buscando eventos del stack ==="
