@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Automatizacion - JordyPrada
+
+Resources:
+
+  ScaleUp1-JordyPrada:
+    Type: AWS::AutoScaling::ScheduledAction
+    Properties:
+      AutoScalingGroupName: !ImportValue ASGName
+      DesiredCapacity: 3
+      Recurrence: '0 8 * * MON-FRI'   # Lunes a viernes a las 8am
+
+  ScaleUp2-JordyPrada:
+    Type: AWS::AutoScaling::ScheduledAction
+    Properties:
+      AutoScalingGroupName: !ImportValue ASGName
+      DesiredCapacity: 3
+      Recurrence: '0 12 * * SAT'       # Sabados al mediodia
+
+  ScaleDown1-JordyPrada:
+    Type: AWS::AutoScaling::ScheduledAction
+    Properties:
+      AutoScalingGroupName: !ImportValue ASGName
+      DesiredCapacity: 1
+      Recurrence: '0 20 * * MON-FRI'   # Lunes a viernes a las 8pm
+
+  ScaleDown2-JordyPrada:
+    Type: AWS::AutoScaling::ScheduledAction
+    Properties:
+      AutoScalingGroupName: !ImportValue ASGName
+      DesiredCapacity: 1
+      Recurrence: '0 22 * * SAT'       # Sabados a las 10pm
+
+  LaunchTemplateV2-JordyPrada:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateId: !ImportValue LaunchTemplateId
+      LaunchTemplateData:
+        UserData:
+          Fn::Base64: |
+            #!/bin/bash
+            yum install -y httpd
+            systemctl start httpd
+            echo '<h1>Version 2 - JordyPrada</h1>' > /var/www/html/index.html
+
+Outputs:
+  LTV2Number:
+    Value: !GetAtt LaunchTemplateV2-JordyPrada.LatestVersionNumber
+    Description: Numero de la version 2 del Launch Template
