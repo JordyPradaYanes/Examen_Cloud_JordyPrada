@@ -58,7 +58,7 @@ jobs:
           OUTPUT=$(aws cloudformation deploy \
             --template-file cloudformation/ec2.yml \
             --stack-name EC2-JordyPrada \
-            --parameter-overrides SubnetId=subnet-014686d5696588e49 \
+            --parameter-overrides SubnetId=subnet-00d1e46d42df52365 \
             --no-fail-on-empty-changeset 2>&1) || {
             echo "$OUTPUT"
             echo "=== Buscando eventos del stack ==="
@@ -74,7 +74,7 @@ jobs:
           OUTPUT=$(aws cloudformation deploy \
             --template-file cloudformation/alb-asg.yml \
             --stack-name ALB-ASG-JordyPrada \
-            --parameter-overrides VpcId=vpc-0551a786fff021d6f SubnetIds=subnet-014686d5696588e49 \
+            --parameter-overrides VpcId=vpc-0551a786fff021d6f SubnetIds=subnet-00d1e46d42df52365\,subnet-036910dc9f91bd9a3 \
             --no-fail-on-empty-changeset 2>&1) || {
             echo "$OUTPUT"
             echo "=== Buscando eventos del stack ==="
