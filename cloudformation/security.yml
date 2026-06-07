@@ -3,7 +3,7 @@ Description: Security Groups - JordyPrada
 
 Resources:
 
-  SGInstancia-JordyPrada:
+  SGInstanciaJordyPrada:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: SG para instancia EC2 publica
@@ -17,7 +17,7 @@ Resources:
           ToPort: 80
           CidrIp: 0.0.0.0/0
 
-  SGAlb-JordyPrada:
+  SGAlbJordyPrada:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: SG para Application Load Balancer
@@ -33,10 +33,10 @@ Resources:
 
 Outputs:
   SGInstanciaId:
-    Value: !Ref SGInstancia-JordyPrada
+    Value: !Ref SGInstanciaJordyPrada
     Export:
       Name: SGInstanciaId
   SGAlbId:
-    Value: !Ref SGAlb-JordyPrada
+    Value: !Ref SGAlbJordyPrada
     Export:
       Name: SGAlbId
