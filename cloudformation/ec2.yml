@@ -6,7 +6,7 @@ Resources:
   EC2-JordyPrada:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: ami-00e801948462f718a
+      ImageId: !Sub "{{resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64}}"
       InstanceType: t3.micro
       SecurityGroupIds:
         - !ImportValue SGInstanciaId

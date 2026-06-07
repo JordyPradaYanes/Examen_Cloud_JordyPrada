@@ -21,79 +21,55 @@ jobs:
           aws-region: us-east-1
 
       - name: Deploy Security Stack
-        id: security
         run: |
           aws cloudformation deploy \
             --template-file cloudformation/security.yml \
             --stack-name SecurityGroups-JordyPrada \
             --capabilities CAPABILITY_NAMED_IAM \
             --no-fail-on-empty-changeset
-        continue-on-error: true
-
-      - name: "[ ERROR ] Security Stack Events"
-        if: steps.security.outcome == 'failure'
-        run: |
-          echo "=== ERRORES EN SECURITY STACK ==="
-          aws cloudformation describe-stack-events \
-            --stack-name SecurityGroups-JordyPrada \
-            --query "StackEvents[?contains(['CREATE_FAILED','UPDATE_FAILED','ROLLBACK_IN_PROGRESS','ROLLBACK_COMPLETE'], ResourceStatus)].[LogicalResourceId, ResourceStatus, ResourceStatusReason]" \
-            --output table
-          exit 1
 
       - name: Deploy EC2 Stack
-        id: ec2
         run: |
-          aws cloudformation deploy \
+          OUTPUT=$(aws cloudformation deploy \
             --template-file cloudformation/ec2.yml \
             --stack-name EC2-JordyPrada \
-            --no-fail-on-empty-changeset
-        continue-on-error: true
-
-      - name: "[ ERROR ] EC2 Stack Events"
-        if: steps.ec2.outcome == 'failure'
-        run: |
-          echo "=== ERRORES EN EC2 STACK ==="
-          aws cloudformation describe-stack-events \
-            --stack-name EC2-JordyPrada \
-            --query "StackEvents[?contains(['CREATE_FAILED','UPDATE_FAILED','ROLLBACK_IN_PROGRESS','ROLLBACK_COMPLETE'], ResourceStatus)].[LogicalResourceId, ResourceStatus, ResourceStatusReason]" \
-            --output table
-          exit 1
+            --no-fail-on-empty-changeset 2>&1) || {
+            echo "$OUTPUT"
+            echo "=== Buscando eventos del stack ==="
+            aws cloudformation describe-stack-events \
+              --stack-name EC2-JordyPrada \
+              --query "StackEvents[?contains(['CREATE_FAILED','UPDATE_FAILED'], ResourceStatus)].[LogicalResourceId, ResourceStatus, ResourceStatusReason]" \
+              --output table 2>/dev/null || echo "Stack no existe (fue eliminado por rollback). Revisa el OUTPUT de arriba."
+            exit 1
+          }
 
       - name: Deploy ALB-ASG Stack
-        id: albasg
         run: |
-          aws cloudformation deploy \
+          OUTPUT=$(aws cloudformation deploy \
             --template-file cloudformation/alb-asg.yml \
             --stack-name ALB-ASG-JordyPrada \
             --parameter-overrides VpcId=vpc-0551a786fff021d6f SubnetIds=subnet-014686d5696588e49 \
-            --no-fail-on-empty-changeset
-        continue-on-error: true
-
-      - name: "[ ERROR ] ALB-ASG Stack Events"
-        if: steps.albasg.outcome == 'failure'
-        run: |
-          echo "=== ERRORES EN ALB-ASG STACK ==="
-          aws cloudformation describe-stack-events \
-            --stack-name ALB-ASG-JordyPrada \
-            --query "StackEvents[?contains(['CREATE_FAILED','UPDATE_FAILED','ROLLBACK_IN_PROGRESS','ROLLBACK_COMPLETE'], ResourceStatus)].[LogicalResourceId, ResourceStatus, ResourceStatusReason]" \
-            --output table
-          exit 1
+            --no-fail-on-empty-changeset 2>&1) || {
+            echo "$OUTPUT"
+            echo "=== Buscando eventos del stack ==="
+            aws cloudformation describe-stack-events \
+              --stack-name ALB-ASG-JordyPrada \
+              --query "StackEvents[?contains(['CREATE_FAILED','UPDATE_FAILED'], ResourceStatus)].[LogicalResourceId, ResourceStatus, ResourceStatusReason]" \
+              --output table 2>/dev/null || echo "Stack no existe (fue eliminado por rollback). Revisa el OUTPUT de arriba."
+            exit 1
+          }
 
       - name: Deploy Automation Stack
-        id: automation
         run: |
-          aws cloudformation deploy \
+          OUTPUT=$(aws cloudformation deploy \
             --template-file cloudformation/automation.yml \
             --stack-name Automation-JordyPrada \
-            --no-fail-on-empty-changeset
-        continue-on-error: true
-
-      - name: "[ ERROR ] Automation Stack Events"
-        if: steps.automation.outcome == 'failure'
-        run: |
-          echo "=== ERRORES EN AUTOMATION STACK ==="
-          aws cloudformation describe-stack-events \
-            --stack-name Automation-JordyPrada \
-            --query "StackEvents[?contains(['CREATE_FAILED','UPDATE_FAILED','ROLLBACK_IN_PROGRESS','ROLLBACK_COMPLETE'], ResourceStatus)].[LogicalResourceId, ResourceStatus, ResourceStatusReason]" \
-            --output table
-          exit 1
+            --no-fail-on-empty-changeset 2>&1) || {
+            echo "$OUTPUT"
+            echo "=== Buscando eventos del stack ==="
+            aws cloudformation describe-stack-events \
+              --stack-name Automation-JordyPrada \
+              --query "StackEvents[?contains(['CREATE_FAILED','UPDATE_FAILED'], ResourceStatus)].[LogicalResourceId, ResourceStatus, ResourceStatusReason]" \
+              --output table 2>/dev/null || echo "Stack no existe (fue eliminado por rollback). Revisa el OUTPUT de arriba."
+            exit 1
+          }
