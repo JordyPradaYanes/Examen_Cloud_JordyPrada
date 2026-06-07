@@ -3,35 +3,35 @@ Description: Automatizacion - JordyPrada
 
 Resources:
 
-  ScaleUp1-JordyPrada:
+  ScaleUp1JordyPrada:
     Type: AWS::AutoScaling::ScheduledAction
     Properties:
       AutoScalingGroupName: !ImportValue ASGName
       DesiredCapacity: 3
       Recurrence: '0 8 * * MON-FRI'   # Lunes a viernes a las 8am
 
-  ScaleUp2-JordyPrada:
+  ScaleUp2JordyPrada:
     Type: AWS::AutoScaling::ScheduledAction
     Properties:
       AutoScalingGroupName: !ImportValue ASGName
       DesiredCapacity: 3
       Recurrence: '0 12 * * SAT'       # Sabados al mediodia
 
-  ScaleDown1-JordyPrada:
+  ScaleDown1JordyPrada:
     Type: AWS::AutoScaling::ScheduledAction
     Properties:
       AutoScalingGroupName: !ImportValue ASGName
       DesiredCapacity: 1
       Recurrence: '0 20 * * MON-FRI'   # Lunes a viernes a las 8pm
 
-  ScaleDown2-JordyPrada:
+  ScaleDown2JordyPrada:
     Type: AWS::AutoScaling::ScheduledAction
     Properties:
       AutoScalingGroupName: !ImportValue ASGName
       DesiredCapacity: 1
       Recurrence: '0 22 * * SAT'       # Sabados a las 10pm
 
-  LaunchTemplateV2-JordyPrada:
+  LaunchTemplateV2JordyPrada:
     Type: AWS::EC2::LaunchTemplate
     Properties:
       LaunchTemplateName: LT-V2-JordyPrada
@@ -49,5 +49,5 @@ Resources:
 
 Outputs:
   LTV2Number:
-    Value: !GetAtt LaunchTemplateV2-JordyPrada.LatestVersionNumber
+    Value: !GetAtt LaunchTemplateV2JordyPrada.LatestVersionNumber
     Description: Numero de la version 2 del Launch Template

@@ -9,7 +9,7 @@ Parameters:
 
 Resources:
 
-  TargetGroup-JordyPrada:
+  TargetGroupJordyPrada:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Name: TG-JordyPrada
@@ -19,7 +19,7 @@ Resources:
       HealthCheckPath: /
       HealthCheckIntervalSeconds: 30
 
-  ALB-JordyPrada:
+  ALBJordyPrada:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Name: ALB-JordyPrada
@@ -31,14 +31,14 @@ Resources:
   ListenerALB:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
-      LoadBalancerArn: !Ref ALB-JordyPrada
+      LoadBalancerArn: !Ref ALBJordyPrada
       Port: 80
       Protocol: HTTP
       DefaultActions:
         - Type: forward
-          TargetGroupArn: !Ref TargetGroup-JordyPrada
+          TargetGroupArn: !Ref TargetGroupJordyPrada
 
-  LaunchTemplate-JordyPrada:
+  LaunchTemplateJordyPrada:
     Type: AWS::EC2::LaunchTemplate
     Properties:
       LaunchTemplateName: LT-JordyPrada
@@ -54,7 +54,7 @@ Resources:
             systemctl start httpd
             echo '<h1>ASG - JordyPrada</h1>' > /var/www/html/index.html
 
-  ASG-JordyPrada:
+  ASGJordyPrada:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
       AutoScalingGroupName: ASG-JordyPrada
@@ -63,27 +63,27 @@ Resources:
       DesiredCapacity: '2'
       VPCZoneIdentifier: !Ref SubnetIds
       LaunchTemplate:
-        LaunchTemplateId: !Ref LaunchTemplate-JordyPrada
-        Version: !GetAtt LaunchTemplate-JordyPrada.LatestVersionNumber
+        LaunchTemplateId: !Ref LaunchTemplateJordyPrada
+        Version: !GetAtt LaunchTemplateJordyPrada.LatestVersionNumber
       TargetGroupARNs:
-        - !Ref TargetGroup-JordyPrada
+        - !Ref TargetGroupJordyPrada
 
-  WarmPool-JordyPrada:
+  WarmPoolJordyPrada:
     Type: AWS::AutoScaling::WarmPool
     Properties:
-      AutoScalingGroupName: !Ref ASG-JordyPrada
+      AutoScalingGroupName: !Ref ASGJordyPrada
       MinSize: 1
 
 Outputs:
   ALBDns:
-    Value: !GetAtt ALB-JordyPrada.DNSName
+    Value: !GetAtt ALBJordyPrada.DNSName
     Export:
       Name: ALBDns
   ASGName:
-    Value: !Ref ASG-JordyPrada
+    Value: !Ref ASGJordyPrada
     Export:
       Name: ASGName
   LaunchTemplateId:
-    Value: !Ref LaunchTemplate-JordyPrada
+    Value: !Ref LaunchTemplateJordyPrada
     Export:
       Name: LaunchTemplateId
